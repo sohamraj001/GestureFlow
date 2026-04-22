@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GestureFLOW</string>
+    <string name="accessibility_service_label">GestureFLOW Gestures</string>
+    <string name="accessibility_service_description">Enables gesture control for Instagram Reels using your front camera via GestureFLOW.</string>
+</resources>
