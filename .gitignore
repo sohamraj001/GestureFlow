@@ -1,0 +1,14 @@
+# Android build artifacts
+**/build/
+*.iml
+.gradle/
+local.properties
+.idea/
+
+# Web build artifacts
+node_modules/
+dist/
+.DS_Store
+
+# MediaPipe model (optional to ignore if you want users to download it)
+# **/assets/*.task
