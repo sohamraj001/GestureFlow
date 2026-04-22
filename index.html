@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GestureFLOW | Hands-Free Reels</title>
+    <meta name="description" content="Experience a hands-free vertical video feed using AI hand gesture recognition.">
+    <link rel="stylesheet" href="style.css">
+    <!-- MediaPipe Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.4/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.4/drawing_utils.js" crossorigin="anonymous"></script>
+    <script>
+        function handleScriptError(name) {
+            console.error(`Failed to load ${name}`);
+            alert(`Critical error: Failed to load ${name}. Please check your internet connection and refresh.`);
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loader"></div>
+            <p id="loading-text">Initializing AI Engine...</p>
+            <div id="debug-log" style="color: #ff0050; font-size: 10px; margin-top: 10px; max-width: 80%; word-break: break-all; opacity: 0.7;"></div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="manual-start" style="display: none; padding: 10px 20px; background: var(--accent-primary); border: none; border-radius: 20px; cursor: pointer; color: black; font-weight: 600;">Grant Camera</button>
+                <button id="skip-ai" style="padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); border-radius: 20px; cursor: pointer; color: white;">Skip AI & Continue</button>
+            </div>
+        </div>
+
+        <!-- Unmute Overlay -->
+        <div id="unmute-overlay" class="unmute-overlay">
+            <div class="unmute-content">
+                <span class="unmute-icon">🔊</span>
+                <p>Tap to start audio</p>
+            </div>
+        </div>
+
+        <!-- Vertical Reels Feed -->
+        <main id="reels-feed" class="reels-feed">
+            <!-- Reels will be injected here or hardcoded -->
+            <section class="reel" id="reel-1">
+                <video loop playsinline muted src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+                <div class="reel-overlay">
+                    <div class="reel-info">
+                        <h3>@cyber_soul</h3>
+                        <p>Neon nights in the digital sprawl. #cyberpunk #neon</p>
+                    </div>
+                    <div class="reel-actions">
+                        <button class="action-btn"><span class="icon">❤️</span><span>124K</span></button>
+                        <button class="action-btn"><span class="icon">💬</span><span>1.2K</span></button>
+                        <button class="action-btn"><span class="icon">✈️</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="reel" id="reel-2">
+                <video loop playsinline muted src="https://www.w3schools.com/html/horse.mp4"></video>
+                <div class="reel-overlay">
+                    <div class="reel-info">
+                        <h3>@nature_vibes</h3>
+                        <p>Serenity by the shore. 🌊 #sunset #ocean</p>
+                    </div>
+                    <div class="reel-actions">
+                        <button class="action-btn"><span class="icon">❤️</span><span>89K</span></button>
+                        <button class="action-btn"><span class="icon">💬</span><span>856</span></button>
+                        <button class="action-btn"><span class="icon">✈️</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="reel" id="reel-3">
+                <video loop playsinline muted src="https://www.w3schools.com/html/mov_bbb.mp4#t=10"></video>
+                <div class="reel-overlay">
+                    <div class="reel-info">
+                        <h3>@botanical_dream</h3>
+                        <p>Golden hour blooms. #spring #nature</p>
+                    </div>
+                    <div class="reel-actions">
+                        <button class="action-btn"><span class="icon">❤️</span><span>45K</span></button>
+                        <button class="action-btn"><span class="icon">💬</span><span>432</span></button>
+                        <button class="action-btn"><span class="icon">✈️</span></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Gesture Controls Sidebar -->
+        <div class="controls-overlay">
+            <div class="gesture-status" id="gesture-indicator">
+                <div class="pulse-ring"></div>
+                <div class="status-icon">✋</div>
+            </div>
+
+            <div class="camera-preview-container">
+                <video id="input-video" class="input-video" autoplay playsinline muted></video>
+                <canvas id="gesture-canvas" class="gesture-canvas"></canvas>
+                <div class="camera-label">Gesture Camera</div>
+            </div>
+
+            <div class="settings-panel">
+                <div class="settings-group">
+                    <button id="toggle-gesture" class="toggle-btn active">
+                        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        <span class="btn-text">Gesture Control</span>
+                    </button>
+                    <button id="toggle-webcam" class="toggle-btn active">
+                        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                        <span class="btn-text">Show Webcam</span>
+                    </button>
+                </div>
+
+                <div class="sensitivity-control">
+                    <div class="sensitivity-labels">
+                        <span>Low</span>
+                        <span>Sensitivity</span>
+                        <span>High</span>
+                    </div>
+                    <input type="range" id="sensitivity-slider" min="5" max="30" value="15" step="1">
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Messages -->
+        <div id="gesture-feedback" class="gesture-feedback">
+            <span class="feedback-icon">↑</span>
+            <span class="feedback-text">Scrolling Up</span>
+        </div>
+    </div>
+
+    <script src="gesture.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
